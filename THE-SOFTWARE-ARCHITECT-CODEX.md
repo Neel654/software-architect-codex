@@ -1,4 +1,4 @@
-# THE SOFTWARE ARCHITECT CODEX
+﻿# THE SOFTWARE ARCHITECT CODEX
 
 ## From Code to Cloud: A Complete Handbook for Building World-Class Software Systems
 
@@ -18,7 +18,7 @@ Every year, thousands of engineers graduate from bootcamps and universities know
 
 There is a gap between writing a function and designing a platform that serves millions. This book exists to bridge that gap.
 
-The software industry has spent decades accumulating knowledge about what works and what doesn't. The problem is that this knowledge is scattered across hundreds of blog posts, thousands of Stack Overflow answers, and the collective memory of senior engineers.
+The software industry has spent decades accumulating knowledge about what works and what doesn't. The problem is that this knowledge is scattered across hundreds of blog posts, thousands of Stack Overflow answers, years of tribal knowledge inside companies, expensive conference talks, and internal wikis you'll never see.
 
 **The Software Architect Codex** collects this knowledge into one complete learning journey.
 
@@ -56,14 +56,14 @@ Every chapter adds to Nexus. Nothing is wasted. Every concept you learn immediat
 
 ### How to Use This Codex
 
-The `examples/` directory contains runnable code, tests, and Docker Compose setups for each stage. The `infra/` directory has Terraform modules for cloud deployment. After reading each stage, open the corresponding example and modify it according to the lab instructions.
+The `examples/` directory contains runnable code, tests, and Docker Compose setups for each stage. The `infra/` directory has Terraform modules for cloud deployment. After reading each stage, open the corresponding lab in `docs/` for hands-on exercises. The `doc/adr/` folder contains Architecture Decision Record templates to document your own choices. See `docs/portfolio-rubric.md` to evaluate your project against professional standards.
 
 ---
 ## STAGE 1: BACKEND FUNDAMENTALS
 
 ### Building the Authentication Service
 
-**STAGE 1 OBJECTIVE:** Build a production-grade authentication service that handles registration, login, tokens, OAuth, 2FA, rate limiting, and session management. Tech: Node.js/Go + PostgreSQL + Redis.
+**STAGE 1 OBJECTIVE:** Build a production-grade authentication service that handles registration, login, tokens, OAuth, 2FA, rate limiting, and session management. Tech: Node.js/Go + PostgreSQL + Redis + JWT.
 
 ### 1.1 Understanding Backend Engineering
 
@@ -298,7 +298,7 @@ When a refresh token is used, ALWAYS rotate:
 
 ### 2.1 Why Databases Exist
 
-In-memory data dies when the server restarts. Files work but don't support concurrent access, efficient querying, or atomicity. Databases solve: **durable, queryable, concurrent, consistent data**.
+In-memory data dies when the server restarts. Files work but don't support concurrent access, efficient querying, or atomicity. Databases solve: **durable, queryable, concurrent, consistent data storage**.
 
 **ACID:**
 - **Atomicity** — Transaction succeeds or fails completely
@@ -438,18 +438,20 @@ CREATE INDEX idx_orders_status_created ON orders(status, created_at);
 
 ```typescript
 // String — Session token
-await redis.set(`session:${userId}`, token, 'EX', 3600);
+await redis.set(session:, token, 'EX', 3600);
 
 // Set — Unique followers
-await redis.sadd(`followers:${userId}`, followerId);
+await redis.sadd(ollowers:, followerId);
 
 // Sorted Set — Feed timeline
-await redis.zadd(`feed:${userId}`, timestamp, postId);
-await redis.zrevrange(`feed:${userId}`, 0, 49);
+await redis.zadd(eed:, timestamp, postId);
+await redis.zrevrange(eed:, 0, 49);
 
 // List — Recent notifications
-await redis.lpush(`notifications:${userId}`, notification);
-await redis.ltrim(`notifications:${userId}`, 0, 99);
+await redis.lpush(
+otifications:, notification);
+await redis.ltrim(
+otifications:, 0, 99);
 ```
 
 ### Stage 2 Exercises
@@ -532,7 +534,7 @@ await redis.ltrim(`notifications:${userId}`, 0, 99);
 ```typescript
 const command = new PutObjectCommand({
   Bucket: 'nexus-uploads',
-  Key: `uploads/${userId}/${filename}`,
+  Key: uploads//-,
   ContentType: contentType
 });
 return getSignedUrl(s3Client, command, { expiresIn: 3600 });
@@ -660,7 +662,7 @@ services:
     build: ./auth-service
     expose: ["3000"]
     environment:
-      DATABASE_URL: postgresql://nexus:password@postgres:5432/nexus
+      DATABASE_URL: postgresql://nexus:\@postgres:5432/nexus
       REDIS_URL: redis://redis:6379
     depends_on:
       postgres: { condition: service_healthy }
@@ -996,96 +998,566 @@ Agents can call tools: search documentation, create tickets, send emails, query 
 
 **Stage 6 Final Project Checklist:**
 - [ ] Document ingestion pipeline (PDF, HTML, Markdown)
-- [ ] Semantic chunking with token counts
-- [ ] Embedding generation and storage in PGVector
-- [ ] Hybrid search (vector + keyword)
-- [ ] LLM response generation with context
-- [ ] Streaming responses to frontend
-- [ ] Tool calling for agents
-- [ ] Memory systems (working, short-term, long-term)
+- [ ] Intelligent chunking with overlap
+- [ ] Embedding generation
+- [ ] Vector database with PGVector
+- [ ] Hybrid search (vector + full-text)
+- [ ] Streaming LLM responses
+- [ ] RAG for question answering
+- [ ] AI agents with tool calling
+- [ ] Memory system (working + long-term)
 
 ### Stage 6 Lab
 
-**What to build:** Build a complete RAG pipeline. Upload documents, chunk them, embed them, search them, and generate responses with LLM.
+**What to build:** RAG pipeline — ingest documents, chunk, embed, store in vector DB, retrieve, and answer with LLM.
 
 **Minimum viable submission:**
-- Document ingestion from files
-- Vector embeddings stored in PostgreSQL
-- Semantic + keyword search working
-- LLM streaming responses with context
+- Document chunking with overlap
+- Embedding generation (OpenAI or local model)
+- Vector DB with similarity search
+- RAG query that returns contextual answers
 
-**Resources:** `examples/rag/chunker.js` | `examples/rag/embeddings.js` | `examples/rag/search.js`
-
----
-## FINAL PROJECT: BUILDING NEXUS
-
-After completing all 6 stages, you will have built **Nexus** — a production-grade distributed platform.
-
-**Nexus includes:**
-- ✅ Authentication (JWT, OAuth, 2FA)
-- ✅ Social features (follows, posts, likes, comments)
-- ✅ Real-time chat (WebSockets, cursor pagination)
-- ✅ Cloud deployment (AWS, Docker, Kubernetes-ready)
-- ✅ Microservices architecture (7+ independent services)
-- ✅ AI features (RAG, embeddings, semantic search)
-- ✅ Monitoring (logs, metrics, traces, alerts)
-- ✅ Testing (unit, integration, load tests)
-
-### What You've Learned
-
-You now understand:
-1. **Backend engineering** — How servers handle millions of requests
-2. **Database design** — How to model and scale data
-3. **Cloud architecture** — How to deploy globally
-4. **Containerization** — How to ship code reliably
-5. **Distributed systems** — How to build resilient platforms
-6. **AI engineering** — How to add intelligence to applications
-
-### Interview Preparation
-
-By building Nexus, you've prepared for system design interviews at top companies:
-- You can explain every architectural decision
-- You can discuss trade-offs confidently
-- You understand production constraints
-- You've solved problems at scale
-
-### Next Steps
-
-The knowledge in this codex is foundational. The industry evolves constantly. Your next steps:
-
-1. **Go deeper:** Pick one specialization (databases, infrastructure, security, AI)
-2. **Read more:** Follow blogs from engineers at Google, Netflix, Amazon, Stripe
-3. **Build more:** Every project teaches new lessons
-4. **Teach others:** Teaching forces clarity
+**Resources:** `docs/portfolio-rubric.md#stage-6-ai`
 
 ---
+## STAGE 7: SEARCH ENGINEERING
 
-## RESOURCES
+### Beyond SQL LIKE Queries
 
-**Recommended Reading:**
-- Designing Data-Intensive Applications (Kleppmann)
-- Release It! (Nygard)
-- The Phoenix Project (Kim, Behr, George)
-- Building Microservices (Newman)
+**STAGE 7 OBJECTIVE:** Build a professional search engine with full-text, semantic, and hybrid search. Tech: Elasticsearch, OpenSearch, Ranking Algorithms.
 
-**Tools & Technologies:**
-- PostgreSQL (database)
-- Redis (caching)
-- Docker (containerization)
-- Kubernetes (orchestration)
-- AWS (cloud platform)
-- OpenAI API (LLMs)
+### 7.1 Why Dedicated Search?
 
-**Community:**
-- GitHub: Share your Nexus implementation
-- Twitter/X: Follow engineers building at scale
-- Discord: Join the software architecture community
-- Blogs: Start writing about what you learn
+SQL's LIKE '%query%' does a full table scan. Can't rank results. Doesn't understand language.
+
+A search engine uses an **inverted index**: word → list of documents containing it. This enables instant full-text search across millions of documents.
+
+### 7.2 Elasticsearch Architecture
+
+An Elasticsearch cluster has nodes with primary and replica shards. Documents are indexed across shards. Search queries are broadcast to all shards and results are merged.
+
+**Key concepts:** Index → Type → Document. Sharding for scale, replication for durability.
+
+### 7.3 Search Quality: BM25 Ranking
+
+BM25 is the default ranking algorithm in modern search engines:
+
+- **TF (Term Frequency):** How often the query term appears in the document
+- **IDF (Inverse Document Frequency):** How rare the term is across all documents
+- **Length normalization:** Shorter documents get a boost
+
+"Kubernetes" appears in few docs → IDF = high → high score
+"The" appears in every doc → IDF = low → low score
+
+### 7.4 Hybrid Search (Vector + Keyword)
+
+For best results, combine:
+1. **Keyword search (BM25):** Exact term matching, handles rare terms well
+2. **Vector search (KNN):** Semantic similarity, handles synonyms well
+3. **Fusion:** Weighted combination (e.g., 30% keyword + 70% vector)
+
+### 7.5 Search Features
+
+- **Autocomplete:** Edge n-gram tokenizer for prefix matching
+- **Faceted search:** Filter by category, author, date range, tags
+- **Highlighting:** Show matching terms in context
+- **Fuzzy matching:** Handle typos with Levenshtein distance
+- **Personalized ranking:** Boost results based on user history
+
+### Stage 7 Final Project Checklist:
+
+- [ ] Elasticsearch cluster with replicas
+- [ ] Custom analyzers with autocomplete
+- [ ] Full-text search with BM25 ranking
+- [ ] Vector/KNN search for semantic matching
+- [ ] Hybrid search fusion
+- [ ] Faceted search (by author, tag, date)
+- [ ] Autocomplete/suggest
+- [ ] Highlighted results
+- [ ] Search analytics dashboard
+
+### Stage 7 Lab
+
+**What to build:** Elasticsearch cluster with full-text, vector, and hybrid search. Autocomplete and faceted filtering.
+
+**Minimum viable submission:**
+- Elasticsearch index with custom analyzers
+- Full-text search returning ranked results
+- At least one aggregation (faceted filter)
+- Autocomplete/suggest endpoint
+
+**Resources:** `docs/portfolio-rubric.md#stage-7-search`
+
+---
+## STAGE 8: OBSERVABILITY
+
+### Seeing What Your System Is Doing
+
+**STAGE 8 OBJECTIVE:** Make every part of Nexus observable. Detect failures before users do. Tech: Logging, Metrics, Tracing, Alerting, SLOs.
+
+### 8.1 The Three Pillars
+
+1. **Logs** — What happened? (Debugging)
+2. **Metrics** — What's the trend? (Alerting)
+3. **Traces** — What's the path? (Performance analysis)
+
+### 8.2 Structured Logging
+
+Always log as structured JSON, not plain text. Include: timestamp, service, level, event, requestId, userId, and error details.
+
+```json
+{"timestamp":"2024-01-15T10:30:00Z","service":"auth-service","level":"ERROR","event":"login.failed","requestId":"abc-123","userId":"user_42","error":{"message":"Invalid password","name":"AuthError"}}
+```
+
+### 8.3 Key Metrics: RED Method
+
+| Resource        | Rate            | Errors    | Duration         |
+|-----------------|-----------------|-----------|------------------|
+| API Gateway     | requests/sec    | 5xx count | p50/p95/p99      |
+| Auth Service    | logins/sec      | failures  | login time       |
+| Database        | queries/sec     | deadlocks | query time       |
+| Queue           | messages/sec    | failures  | processing time  |
+
+### 8.4 Distributed Tracing
+
+Use OpenTelemetry to trace requests across services. Each request gets a trace_id that propagates through all service calls. This lets you see the full path of a request.
+
+### 8.5 SLOs, SLIs, Error Budgets
+
+- **SLI:** What we measure (latency p99 < 500ms)
+- **SLO:** What we promise (99.9% of requests under 500ms)
+- **Error budget:** 100% - SLO = allowed failures (0.1% = ~8.76 hours/year)
+- **When budget is low:** Freeze deploys until error rate drops
+
+### 8.6 Alerting
+
+**Severity Levels:**
+- P0 (<15 min): Service down, data loss
+- P1 (<1 hr): Major feature broken
+- P2 (<4 hr): Partial degradation
+- P3 (<1 day): Non-critical issue
+- P4 (best effort): Minor cosmetic issue
+
+### Stage 8 Final Project Checklist:
+
+- [ ] Structured JSON logging across all services
+- [ ] Prometheus metrics (RED method)
+- [ ] Grafana dashboards for every service
+- [ ] Distributed tracing with OpenTelemetry
+- [ ] SLO definitions for critical paths
+- [ ] Alerting rules (P0-P4)
+- [ ] On-call runbooks
+- [ ] Health check endpoints (/health, /ready)
+
+### Stage 8 Lab
+
+**What to build:** Instrument Nexus with structured logs, Prometheus metrics, distributed tracing, and Grafana dashboards.
+
+**Minimum viable submission:**
+- Structured JSON logging in all services
+- `/metrics` endpoint with Prometheus metrics
+- At least one Grafana dashboard with latency + error panels
+- SLO definition for auth service
+
+**Resources:** `docs/observability-lab.md` | `infra/monitoring/prometheus-rules.yaml` | `docs/grafana-dashboard-guidance.md`
+
+---
+## STAGE 9: KUBERNETES
+
+### Operating at Scale
+
+**STAGE 9 OBJECTIVE:** Run Nexus on Kubernetes. Auto-scale, self-heal, rolling updates. From 1 to 100+ containers. Tech: Pods, Deployments, Services, Ingress, HPA.
+
+### 9.1 Why Kubernetes?
+
+**Docker Compose problems at scale:** No auto-healing, no auto-scaling, no rolling updates, no service discovery, no secret management.
+
+**Kubernetes solves:** Run containers like a Google data center — automated deployment, scaling, and management.
+
+### 9.2 Core Resources
+
+**Pod:** The smallest deployable unit. One or more containers with shared network and storage.
+
+**Deployment:** Declarative updates for Pods. Supports replicas, rolling updates, rollbacks, self-healing.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: nexus
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nexus
+      service: auth
+  template:
+    spec:
+      containers:
+        - name: auth-service
+          image: nexusapp/auth-service:1.2.3
+          ports:
+            - containerPort: 3000
+          livenessProbe:
+            httpGet: { path: /health, port: 3000 }
+          readinessProbe:
+            httpGet: { path: /ready, port: 3000 }
+```
+
+**Service:** Stable network endpoint for a set of Pods. Load balances traffic.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: nexus
+spec:
+  selector:
+    app: nexus
+    service: auth
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
+```
+
+**Ingress:** External HTTP/HTTPS routing with host/path-based routing, TLS termination, and rate limiting.
+
+### 9.3 Horizontal Pod Autoscaler
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auth-service-hpa
+  namespace: nexus
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auth-service
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+### 9.4 Kubernetes Production Best Practices
+
+1. PodDisruptionBudget: Keep minimum pods available during maintenance
+2. Network Policies: Micro-segmentation between services
+3. Resource Quotas: Prevent one team from consuming all cluster resources
+4. Readiness + Liveness probes: Dont send traffic to unhealthy pods
+5. PreStop hooks: Graceful shutdown (drain connections before terminating)
+6. Resource requests/limits: Every container must specify CPU and memory
+
+### Stage 9 Final Project Checklist:
+
+- All services deployed as Deployments
+- Services for internal communication
+- Ingress with TLS termination
+- ConfigMaps and Secrets
+- HPA for auto-scaling (3-20 pods)
+- PodDisruptionBudget (min 2 available)
+- Liveness + Readiness probes
+- Rolling update strategy
+- Network policies for security
+- Resource quotas per namespace
+
+### Stage 9 Lab
+
+**What to build:** Deploy Nexus on Kubernetes with Deployments, Services, Ingress, HPA, and rolling updates.
+
+**Minimum viable submission:**
+- All services as Kubernetes Deployments with health probes
+- Ingress with TLS
+- HPA scaling on CPU (3-20 pods)
+- Successful rolling update (zero-downtime deploy)
+
+**Resources:** `docs/portfolio-rubric.md#stage-9-kubernetes`
+
+---
+## STAGE 10: SOFTWARE ARCHITECTURE & SYSTEM DESIGN
+
+### Thinking Like an Architect
+
+**STAGE 10 OBJECTIVE:** Design systems used by millions. Make principled trade-offs. Think at the architecture level. Systems: Instagram, Netflix, Uber, YouTube, Amazon, Discord, WhatsApp, ChatGPT.
+
+### 10.1 The Architecture Mindset
+
+**Junior Engineer:** Writes code, solves one problem.
+**Senior Engineer:** Designs systems, solves classes of problems.
+**Staff Engineer:** Defines strategy, solves organizational problems.
+**Principal/Architect:** Sets technical vision, influences industry.
+
+### 10.2 The Architecture Decision Framework
+
+Every architecture decision must answer:
+1. **Functional requirements** — What must it do?
+2. **Non-functional requirements** — How well must it do it? (latency, throughput, availability, durability)
+3. **Constraints** — Time, budget, team size, tech stack
+4. **Trade-offs** — No perfect solution exists
+5. **Decision** — With clear rationale
+6. **Impact** — On performance, cost, complexity, team
+
+### 10.3 Instagram Architecture
+
+**Key challenges:** 1B+ MAU, 100M+ photos/day, feed load < 500ms, 99.99% availability.
+
+**Architecture decisions:**
+- **Hybrid fan-out feed:** Celebrities (>100K followers) use fan-out on read; regular users use fan-out on write
+- **Post storage:** S3 + CloudFront CDN for global delivery
+- **Social graph:** Cassandra (high write volume, no joins needed)
+- **Feed cache:** Redis sorted sets (sub-millisecond reads)
+- **Photo upload:** Async via Kafka queue (dont block user)
+- **ID generation:** Snowflake (globally unique, sortable, 64-bit)
+
+### 10.4 Netflix Architecture
+
+**Key challenges:** 200M+ subscribers, stream to any device, adaptive bitrate, global CDN.
+
+**Architecture decisions:**
+- **Open Connect CDN:** Netflix appliances inside ISP networks for local content delivery
+- **Adaptive Bitrate (BOLA):** Monitor buffer and bandwidth, select optimal quality
+- **Chaos Engineering:** Chaos Monkey randomly kills services to test resilience
+- **Microservices:** 500+ microservices, each independently deployable
+- **Asynchronous event bus:** Kafka for all inter-service communication
+
+### 10.5 Uber Architecture
+
+**Key challenges:** Real-time matching of riders/drivers, geospatial queries, surge pricing.
+
+**Key components:**
+- **H3 Geospatial Index:** Hexagonal grid for fast nearby-driver queries
+- **Matching Engine:** Custom optimization engine (C++) for price-time matching
+- **Dispatch:** Ringpop for consistent hashing of riders to dispatchers
+- **Surge Pricing:** ML model based on demand/supply ratio
+
+### 10.6 WhatsApp Architecture
+
+**Key challenges:** 2B+ users, end-to-end encryption, real-time delivery, no message loss, minimal server storage.
+
+**Architecture decisions:**
+- **End-to-end encryption:** Signal Protocol — server never sees message content
+- **Persistent connections:** Long-lived TCP connections per user (Ejabberd, Erlang-based)
+- **Store-and-forward:** Messages stored on server (30 day TTL) if recipient offline
+- **Minimal metadata:** Server stores only delivery status, not message content
+- **Single-threaded per user:** All messages for a user processed sequentially
+
+### 10.7 The System Design Interview Framework
+
+1. Understand requirements (functional + non-functional)
+2. Estimate scale (DAU, requests/sec, storage, bandwidth)
+3. Design data model (entities, relationships, storage choice)
+4. Design API (endpoints, request/response format)
+5. Design high-level architecture (components and their interactions)
+6. Deep dive components (database, caching, scaling, consistency)
+7. Identify bottlenecks and trade-offs
+8. Optimize and document decisions
+
+### Stage 10 Final Project Checklist:
+
+- Architecture Decision Records (ADRs) for every major decision
+- C4 diagrams (Context, Container, Component, Code)
+- Data flow diagrams for critical paths
+- Disaster recovery plan
+- Cost analysis per service
+- Security threat model
+- Trade-off analysis document
+- Evolution plan for next 12 months
+
+### Stage 10 Lab
+
+**What to build:** Architecture Decision Records, C4 diagrams, disaster recovery plan, and trade-off analysis for Nexus.
+
+**Minimum viable submission:**
+- At least 3 ADRs covering major architectural decisions
+- Context and Container diagrams (C4 model)
+- Trade-off analysis comparing two architectural approaches
+- Security threat model for auth service
+
+**Resources:** `doc/adr/template.md` | `doc/adr/0001-record-architecture-decision.md` | `docs/portfolio-rubric.md#stage-10-architecture`
+
+---
+## FINAL CHAPTER: THE 24-MONTH MASTERY ROADMAP
+
+### From Apprentice to Architect
+
+This roadmap assumes 15-20 hours/week. Minimum time to Staff Engineer: 5-7 years. With focused effort: 2 years to strong senior level.
+
+### Months 1-3: Foundations
+
+**Topics:** TypeScript, Go, REST APIs, Authentication, OAuth, JWT, PostgreSQL, Git, CI/CD basics.
+
+**Books:** Clean Code (Martin), The Pragmatic Programmer (Hunt & Thomas), HTTP: The Definitive Guide.
+
+**Projects:**
+- Nexus Auth Service (complete Stage 1)
+- Instagram DB schema design
+- Deploy a personal portfolio with CI/CD
+
+**Skill level:** Can build and deploy a production-quality API service with auth, database, and caching.
+
+### Months 4-6: Data & Scale
+
+**Topics:** Advanced SQL, indexing, NoSQL (Cassandra/Mongo), Redis, AWS (EC2, S3, RDS, VPC, ELB), Docker, CAP Theorem.
+
+**Books:** Designing Data-Intensive Applications (Kleppmann), Database Internals (Petrov).
+
+**Projects:**
+- Nexus database schemas for all services
+- Deploy Nexus on AWS with VPC, ALB, Auto Scaling
+- Containerize with Docker and docker-compose
+
+**Skill level:** Can design scalable databases, deploy to cloud, and containerize applications.
+
+### Months 7-9: Distributed Systems
+
+**Topics:** Microservices, message queues (Kafka/RabbitMQ), circuit breakers, Saga pattern, API Gateway, gRPC.
+
+**Books:** Building Microservices (Newman), Designing Distributed Systems (Burns).
+
+**Projects:**
+- Split Nexus into microservices
+- Implement event-driven communication
+- Add circuit breakers and retry logic
+
+**Skill level:** Can decompose monoliths, design async communication, handle distributed failures.
+
+### Months 10-12: AI & Search
+
+**Topics:** Embeddings, vector databases, RAG pipelines, LLM APIs, AI agents, Elasticsearch, BM25 ranking, hybrid search.
+
+**Books:** Designing Machine Learning Systems (Huyen), AI Engineering.
+
+**Projects:**
+- Add RAG pipeline to Nexus
+- Implement hybrid search with Elasticsearch
+- Build AI agents with tool calling
+
+**Skill level:** Can build AI-powered features and professional search into any application.
+
+### Months 13-15: Production Engineering
+
+**Topics:** Observability (logs, metrics, traces), Prometheus, Grafana, OpenTelemetry, SLOs, incident response.
+
+**Books:** Site Reliability Engineering (Google), The Art of Monitoring (Turnbull).
+
+**Projects:**
+- Add structured logging, metrics, and tracing to Nexus
+- Create Grafana dashboards
+- Define SLOs and alerting rules
+- Write incident runbooks
+
+**Skill level:** Can operate production systems, detect failures before users, and run on-call.
+
+### Months 16-18: Kubernetes & Orchestration
+
+**Topics:** Kubernetes (Pods, Deployments, Services, Ingress, HPA, ConfigMaps, Secrets), Helm, service mesh.
+
+**Books:** Kubernetes in Action (Lukša), The Kubernetes Book (Poulton).
+
+**Projects:**
+- Deploy Nexus on Kubernetes
+- Configure HPA, PDB, network policies
+- Set up CI/CD pipeline for K8s
+
+**Skill level:** Can operate Kubernetes clusters and deploy production workloads.
+
+### Months 19-21: System Design Mastery
+
+**Topics:** Design Instagram, Netflix, Uber, WhatsApp, YouTube, Amazon, Stripe, ChatGPT. Trade-off analysis, capacity planning.
+
+**Books:** System Design Interview (Xu), Designing Data-Intensive Applications (re-read).
+
+**Projects:**
+- Write architecture decision records for Nexus
+- Create C4 diagrams for the full system
+- Conduct mock system design interviews
+
+**Skill level:** Can design systems serving 100M+ users and ace system design interviews.
+
+### Months 22-24: Integration & Leadership
+
+**Topics:** Technical strategy, architecture reviews, mentoring, cross-team communication, production excellence.
+
+**Books:** The Staff Engineer's Path (Reilly), An Elegant Puzzle (Larson).
+
+**Projects:**
+- Mentor junior engineers on Nexus codebase
+- Write technical strategy document for Nexus v2
+- Contribute to open source
+
+**Skill level:** Can define technical strategy, mentor engineers, and influence architecture decisions org-wide.
+
+### The Continuous Learning Path
+
+Beyond 24 months, rotate through these areas:
+- **Performance engineering:** Profiling, optimization, benchmarking
+- **Security engineering:** Threat modeling, penetration testing, security architecture
+- **Developer experience:** Platforms, internal tools, productivity
+- **Research:** Read papers, attend conferences, contribute to the community
+
+### Final Words
+
+**Architecture is not about knowing all the answers. It is about asking the right questions.**
+
+Every system you design will have trade-offs. The goal is not to build the perfect system — that doesn't exist. The goal is to make intentional, well-understood trade-offs that align with your requirements.
+
+**You will make mistakes. Everyone does.**
+**The best engineers learn from production incidents.**
+**The best architects question their own decisions.**
+
+The fact that you've made it to the end of this handbook means you have the curiosity and dedication required to become an exceptional engineer. Now go build something that matters.
+
+## Appendix: Repository Structure
+
+```
+.
+├── THE-SOFTWARE-ARCHITECT-CODEX.md   # This handbook
+├── .github/workflows/ci.yml          # CI pipeline (GitHub Actions)
+├── examples/                          # Runnable code, Docker Compose, tests
+│   ├── auth/token.js                  # JWT + refresh token implementation
+│   ├── auth/password.js               # bcrypt password hashing
+│   ├── tests/auth.unit.test.js        # Unit tests for auth
+│   ├── docker-compose.dev.yml         # Local development environment
+│   ├── Dockerfile                     # Multi-stage build
+│   └── package.json
+├── infra/                             # Infrastructure as Code (Terraform)
+│   ├── README.md                      # How to bootstrap and apply
+│   ├── modules/                       # Reusable Terraform modules
+│   │   ├── network/                   # VPC, subnets, security groups
+│   │   ├── postgres/                  # RDS Aurora PostgreSQL
+│   │   └── redis/                     # ElastiCache Redis
+│   ├── environments/staging/          # Staging environment config
+│   └── monitoring/
+│       └── prometheus-rules.yaml      # Alerting rules
+├── docs/                              # Labs, guides, and rubrics
+│   ├── stage-1-testing.md             # Testing chapter
+│   ├── observability-lab.md           # Observability hands-on
+│   ├── grafana-dashboard-guidance.md  # Dashboard setup guide
+│   └── portfolio-rubric.md            # Evaluation criteria
+└── doc/adr/                           # Architecture Decision Records
+    ├── template.md                    # ADR template
+    └── 0001-record-architecture-decision.md  # Sample ADR
+```
 
 ---
 
-**End of Codex**
+*End of The Software Architect Codex*
 
-*Last Updated: 2024*
-*Version: 1.0*
-*Status: Production Ready*
+*Remember: Knowledge is knowing what to build. Wisdom is knowing what NOT to build.*
+
+---
