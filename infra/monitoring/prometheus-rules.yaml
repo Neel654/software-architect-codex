@@ -1,0 +1,73 @@
+# Nexus — Prometheus Alerting Rules
+#
+# Deploy: place in your Prometheus rules directory (e.g., /etc/prometheus/rules/)
+# Reload: curl -X POST http://localhost:9090/-/reload
+#
+groups:
+  - name: nexus.rules
+    interval: 30s
+    rules:
+
+      # ── Latency + Error Rate (combined) ──
+      - alert: HighAuthServiceLatencyAndErrors
+        expr: |
+          (histogram_quantile(0.95,
+            sum(rate(request_duration_seconds_bucket{job="auth-service"}[5m])) by (le))
+           > 1)
+          and
+          (sum(rate(http_requests_total{job="auth-service", code=~"5.."}[5m])) by (job)
+           / sum(rate(http_requests_total{job="auth-service"}[5m])) by (job) > 0.01)
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "Auth service p95 latency > 1s AND 5xx rate > 1% ({{ $labels.job }})"
+          description: |
+            p95 latency: {{ $value | humanizeDuration }}
+            Investigate high latency and error rate for auth-service.
+
+      # ── Error Rate ──
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{code=~"5.."}[5m])) by (job)
+          / sum(rate(http_requests_total[5m])) by (job) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} error rate > 5%"
+          description: "Error rate is {{ $value | humanizePercentage }} — investigate immediately."
+
+      # ── High Latency ──
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(request_duration_seconds_bucket[5m])) by (job, le)
+          ) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.job }} p99 latency > 2s"
+          description: "p99 latency is {{ $value | humanizeDuration }}"
+
+      # ── Down/Unreachable ──
+      - alert: ServiceDown
+        expr: up{job=~"nexus-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job }} is down"
+          description: "{{ $labels.instance }} has been unreachable for 1 minute."
+
+      # ── Database Connections ──
+      - alert: DatabaseHighConnections
+        expr: |
+          avg by (job) (pg_stat_activity_count) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool near limit"
+          description: "Average connections: {{ $value }} (limit: 80)"

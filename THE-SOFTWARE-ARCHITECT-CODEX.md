@@ -54,6 +54,10 @@ Nexus starts as a simple authentication service. By the end, it will be a distri
 
 Every chapter adds to Nexus. Nothing is wasted. Every concept you learn immediately improves your project.
 
+### How to Use This Codex
+
+The `examples/` directory contains runnable code, tests, and Docker Compose setups for each stage. The `infra/` directory has Terraform modules for cloud deployment. After reading each stage, open the corresponding lab in `docs/` for hands-on exercises. The `doc/adr/` folder contains Architecture Decision Record templates to document your own choices. See `docs/portfolio-rubric.md` to evaluate your project against professional standards.
+
 ---
 ## STAGE 1: BACKEND FUNDAMENTALS
 
@@ -274,6 +278,17 @@ When a refresh token is used, ALWAYS rotate:
 - [ ] Account lockout after failed attempts
 - [ ] Audit logging for all auth events
 
+### Stage 1 Lab
+
+**What to build:** Production-grade auth service with JWT, OAuth, 2FA, rate limiting, and Redis sessions.
+
+**Minimum viable submission:**
+- Register, login, token refresh all working
+- Unit tests passing (`npm test` in `examples/`)
+- Docker Compose starts all services (`docker compose -f examples/docker-compose.dev.yml up`)
+
+**Resources:** `docs/stage-1-testing.md` | `examples/tests/auth.unit.test.js` | `examples/auth/token.js` | `examples/auth/password.js`
+
 ---
 ## STAGE 2: DATABASE ENGINEERING
 
@@ -454,6 +469,17 @@ otifications:, 0, 99);
 - [ ] Redis caching for hot data
 - [ ] Proper indexes on all queries
 
+### Stage 2 Lab
+
+**What to build:** Database schemas for Instagram-style social features — users, follows, posts, comments, likes, chats.
+
+**Minimum viable submission:**
+- ER diagram for social graph
+- SQL schema with proper indexes and foreign keys
+- Redis caching layer for feeds
+
+**Resources:** `docs/portfolio-rubric.md#stage-2-database-engineering`
+
 ---
 ## STAGE 3: CLOUD ENGINEERING (AWS)
 
@@ -562,6 +588,18 @@ return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 - [ ] CloudWatch dashboards and alarms
 - [ ] Secrets Manager for all credentials
 - [ ] CloudFront CDN for static assets
+
+### Stage 3 Lab
+
+**What to build:** Deploy Nexus to AWS with VPC, RDS, S3, ALB, Auto Scaling, and CloudWatch monitoring.
+
+**Minimum viable submission:**
+- VPC with public/private subnets across 2 AZs
+- RDS PostgreSQL accessible only from app tier
+- S3 bucket with presigned URL upload
+- ALB with health checks and Auto Scaling
+
+**Resources:** `infra/environments/staging/` | `infra/modules/` | `infra/README.md`
 
 ---
 ## STAGE 4: DOCKER
@@ -687,6 +725,18 @@ networks:
 - [ ] Custom network for service discovery
 - [ ] Non-root users in containers
 
+### Stage 4 Lab
+
+**What to build:** Containerize all Nexus services with Docker Compose. Multi-stage builds, health checks, resource limits.
+
+**Minimum viable submission:**
+- Multi-stage Dockerfile for each service
+- `docker-compose -f examples/docker-compose.dev.yml up` starts everything
+- Health checks pass on all containers
+- Non-root user in every container
+
+**Resources:** `examples/Dockerfile` | `examples/docker-compose.dev.yml` | `examples/package.json`
+
 ---
 ## STAGE 5: DISTRIBUTED SYSTEMS
 
@@ -806,6 +856,18 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
 - [ ] Saga pattern for multi-service operations
 - [ ] API Gateway for routing
 - [ ] Graceful degradation on failures
+
+### Stage 5 Lab
+
+**What to build:** Split Nexus monolith into microservices. Add message queue, circuit breakers, and Saga pattern.
+
+**Minimum viable submission:**
+- Two independent services communicating via message queue
+- Circuit breaker on at least one inter-service call
+- Saga with compensating transaction for one flow
+- API Gateway routing requests to correct service
+
+**Resources:** `docs/portfolio-rubric.md#stage-5-distributed-systems`
 
 ---
 ## STAGE 6: AI ENGINEERING
@@ -945,6 +1007,18 @@ Agents can call tools: search documentation, create tickets, send emails, query 
 - [ ] AI agents with tool calling
 - [ ] Memory system (working + long-term)
 
+### Stage 6 Lab
+
+**What to build:** RAG pipeline — ingest documents, chunk, embed, store in vector DB, retrieve, and answer with LLM.
+
+**Minimum viable submission:**
+- Document chunking with overlap
+- Embedding generation (OpenAI or local model)
+- Vector DB with similarity search
+- RAG query that returns contextual answers
+
+**Resources:** `docs/portfolio-rubric.md#stage-6-ai`
+
 ---
 ## STAGE 7: SEARCH ENGINEERING
 
@@ -1001,6 +1075,18 @@ For best results, combine:
 - [ ] Autocomplete/suggest
 - [ ] Highlighted results
 - [ ] Search analytics dashboard
+
+### Stage 7 Lab
+
+**What to build:** Elasticsearch cluster with full-text, vector, and hybrid search. Autocomplete and faceted filtering.
+
+**Minimum viable submission:**
+- Elasticsearch index with custom analyzers
+- Full-text search returning ranked results
+- At least one aggregation (faceted filter)
+- Autocomplete/suggest endpoint
+
+**Resources:** `docs/portfolio-rubric.md#stage-7-search`
 
 ---
 ## STAGE 8: OBSERVABILITY
@@ -1062,6 +1148,18 @@ Use OpenTelemetry to trace requests across services. Each request gets a trace_i
 - [ ] Alerting rules (P0-P4)
 - [ ] On-call runbooks
 - [ ] Health check endpoints (/health, /ready)
+
+### Stage 8 Lab
+
+**What to build:** Instrument Nexus with structured logs, Prometheus metrics, distributed tracing, and Grafana dashboards.
+
+**Minimum viable submission:**
+- Structured JSON logging in all services
+- `/metrics` endpoint with Prometheus metrics
+- At least one Grafana dashboard with latency + error panels
+- SLO definition for auth service
+
+**Resources:** `docs/observability-lab.md` | `infra/monitoring/prometheus-rules.yaml` | `docs/grafana-dashboard-guidance.md`
 
 ---
 ## STAGE 9: KUBERNETES
@@ -1178,6 +1276,18 @@ spec:
 - Network policies for security
 - Resource quotas per namespace
 
+### Stage 9 Lab
+
+**What to build:** Deploy Nexus on Kubernetes with Deployments, Services, Ingress, HPA, and rolling updates.
+
+**Minimum viable submission:**
+- All services as Kubernetes Deployments with health probes
+- Ingress with TLS
+- HPA scaling on CPU (3-20 pods)
+- Successful rolling update (zero-downtime deploy)
+
+**Resources:** `docs/portfolio-rubric.md#stage-9-kubernetes`
+
 ---
 ## STAGE 10: SOFTWARE ARCHITECTURE & SYSTEM DESIGN
 
@@ -1267,6 +1377,18 @@ Every architecture decision must answer:
 - Security threat model
 - Trade-off analysis document
 - Evolution plan for next 12 months
+
+### Stage 10 Lab
+
+**What to build:** Architecture Decision Records, C4 diagrams, disaster recovery plan, and trade-off analysis for Nexus.
+
+**Minimum viable submission:**
+- At least 3 ADRs covering major architectural decisions
+- Context and Container diagrams (C4 model)
+- Trade-off analysis comparing two architectural approaches
+- Security threat model for auth service
+
+**Resources:** `doc/adr/template.md` | `doc/adr/0001-record-architecture-decision.md` | `docs/portfolio-rubric.md#stage-10-architecture`
 
 ---
 ## FINAL CHAPTER: THE 24-MONTH MASTERY ROADMAP
@@ -1399,6 +1521,38 @@ Every system you design will have trade-offs. The goal is not to build the perfe
 **The best architects question their own decisions.**
 
 The fact that you've made it to the end of this handbook means you have the curiosity and dedication required to become an exceptional engineer. Now go build something that matters.
+
+## Appendix: Repository Structure
+
+```
+.
+├── THE-SOFTWARE-ARCHITECT-CODEX.md   # This handbook
+├── .github/workflows/ci.yml          # CI pipeline (GitHub Actions)
+├── examples/                          # Runnable code, Docker Compose, tests
+│   ├── auth/token.js                  # JWT + refresh token implementation
+│   ├── auth/password.js               # bcrypt password hashing
+│   ├── tests/auth.unit.test.js        # Unit tests for auth
+│   ├── docker-compose.dev.yml         # Local development environment
+│   ├── Dockerfile                     # Multi-stage build
+│   └── package.json
+├── infra/                             # Infrastructure as Code (Terraform)
+│   ├── README.md                      # How to bootstrap and apply
+│   ├── modules/                       # Reusable Terraform modules
+│   │   ├── network/                   # VPC, subnets, security groups
+│   │   ├── postgres/                  # RDS Aurora PostgreSQL
+│   │   └── redis/                     # ElastiCache Redis
+│   ├── environments/staging/          # Staging environment config
+│   └── monitoring/
+│       └── prometheus-rules.yaml      # Alerting rules
+├── docs/                              # Labs, guides, and rubrics
+│   ├── stage-1-testing.md             # Testing chapter
+│   ├── observability-lab.md           # Observability hands-on
+│   ├── grafana-dashboard-guidance.md  # Dashboard setup guide
+│   └── portfolio-rubric.md            # Evaluation criteria
+└── doc/adr/                           # Architecture Decision Records
+    ├── template.md                    # ADR template
+    └── 0001-record-architecture-decision.md  # Sample ADR
+```
 
 ---
 

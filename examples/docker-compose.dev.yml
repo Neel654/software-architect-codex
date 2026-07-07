@@ -1,0 +1,72 @@
+# Nexus Local Development Environment
+# Start: docker compose -f docker-compose.dev.yml up -d
+# Stop:  docker compose -f docker-compose.dev.yml down
+# Logs:  docker compose -f docker-compose.dev.yml logs -f auth-service
+
+version: '3.9'
+
+services:
+  # --------------- Auth Service ---------------
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://nexus:nexusdev@postgres:5432/nexus_dev
+      REDIS_URL: redis://:nexusdev@redis:6379
+      JWT_ACCESS_SECRET: dev-access-secret-key-change-in-production
+      JWT_REFRESH_SECRET: dev-refresh-secret-key-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app          # Hot-reload with mounted source
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # --------------- PostgreSQL ---------------
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: nexus_dev
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexusdev
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # --------------- Redis ---------------
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass nexusdev
+    volumes:
+      - redis-dev-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres-dev-data:
+  redis-dev-data:

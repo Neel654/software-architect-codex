@@ -1,0 +1,20 @@
+{
+  "name": "nexus-auth-examples",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nexus Auth Service — example code and tests",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage --forceExit",
+    "test:integration": "jest --config jest.integration.config.js --forceExit",
+    "lint": "eslint 'auth/**/*.js' 'tests/**/*.js' 2>/dev/null || echo 'eslint not configured'",
+    "start": "node auth/server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

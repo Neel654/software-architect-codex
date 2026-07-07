@@ -1,0 +1,86 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+crash.*.log
+
+# Docker
+.docker/
+
+# Home directory artifacts (repo lives in ~)
+.antigravity/
+.bash_history
+.cache/
+.claude/
+.config/
+.gemini/
+.ignition/
+.ipynb_checkpoints/
+.ipython/
+.jupyter/
+.local/
+.viminfo
+AppData/
+Contacts/
+Downloads/
+Favorites/
+Library/
+Links/
+Music/
+NTUSER.DAT*
+ntuser.*
+OneDrive*/
+Searches/
+Videos/
+Web/
+WebComponents/
+*.bin
+*.txt
+*.rdp
+*.html
+*.ipynb
+*.json
+battery-report.*
+maintenance-ai/
+service-platform/
+package-lock.json

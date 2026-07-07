@@ -1,0 +1,23 @@
+# ADR 0001: Use JWT Access Tokens + Opaque Refresh Tokens with Rotation
+
+- **Status:** Accepted
+- **Context:** The Nexus authentication service needs a token-based auth system. We need to balance security, performance, and user experience. Session tokens require server-side state (not ideal for microservices), while pure JWTs cannot be revoked.
+- **Decision:** Use short-lived JWT access tokens (15 min) for API authorization paired with opaque refresh tokens (7 days) stored as SHA-256 hashes. Implement automatic token rotation: every refresh invalidates the previous refresh token and issues a new pair.
+- **Consequences:**
+  - Access tokens are stateless — any service can verify them without DB lookups
+  - Refresh tokens can be revoked — rotate on use, revoke all on suspected theft
+  - 15-min access token window means compromised tokens are dangerous for limited time
+  - Requires Redis/DB lookup for refresh token validation (acceptable trade-off)
+  - Rotation pattern detects token theft: if a revoked token is used, revoke all user sessions
+- **Alternatives considered:**
+  - **Option A: Pure session tokens (opaque, stored in Redis)**
+    - Pros: Fully revocable, no JWT complexity
+    - Cons: Every request needs Redis lookup; slower
+  - **Option B: Long-lived JWTs (7 days)**
+    - Pros: Simple, no refresh needed
+    - Cons: Cannot revoke; compromised token = permanent access
+  - **Option C: SAML / OAuth-only**
+    - Pros: Industry standard for enterprise SSO
+    - Cons: Heavy protocol; overkill for internal auth
+- **Date:** 2024-01-15
+- **Authors:** Nexus Architecture Team
